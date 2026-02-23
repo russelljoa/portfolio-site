@@ -1,0 +1,538 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import clsx from "clsx";
+
+/**
+ * Single-Page Portfolio for Russell Joarder
+ * Theme: Light Mode, Monospace, ASCII/Terminal
+ */
+
+// --- DATA ---
+
+const RESUME = {
+  identity: {
+    name: "Russell Joarder",
+    role: "cs_undergrad",
+    location: "West Chester, PA",
+    email: "rjoarder@bu.edu",
+    phone: "(484) 983-2295",
+    github: "github.com/russelljoa",
+    linkedin: "linkedin.com/in/russell-joarder",
+    tagline: "I build systems + ship products"
+  },
+  stats: [
+    { label: "gpa", value: "3.7/4.0" },
+    { label: "grad", value: "May 2028" },
+    { label: "stack", value: "nextjs node aws mongo" },
+    { label: "scale", value: "100+ users / 2.1TB" }
+  ],
+  projects: [
+    {
+      id: "parrot",
+      name: "parrotdrop.com",
+      desc: "media sharing platform",
+      status: "open",
+      details: [
+        "Full-stack file/media sharing platform with temporary lifecycles, short-link sharing",
+        "Next.js (TypeScript) frontend + Node.js REST API",
+        "AWS S3 storage, MongoDB metadata, Firebase Auth JWT, Socket.IO",
+        "Scaled to 100+ users and 2.1TB total transfers",
+        "S3 signed URLs and backend access controls"
+      ],
+      link: "https://parrotdrop.com" // assumed based on resume text
+    },
+    {
+      id: "wordle",
+      name: "github.com/russelljoa/wordle-solver",
+      desc: "python constraint solver",
+      status: "complete",
+      details: [
+        "Python solver using letter-frequency + constraint propagation",
+        "Fast lookups with hashed structures + per-word metadata",
+        "≈95% solve rate across word pool",
+        "Automated testing framework for constraints/heuristics"
+      ],
+      link: "https://github.com/russelljoa/wordle-solver"
+    }
+  ],
+  experience: [
+    {
+      id: "chesco",
+      date: "2025-10",
+      company: "ChesCo Webworks",
+      role: "Co-Founder & Lead Developer",
+      details: [
+        "Lead gen sites for 6+ businesses with Next.js",
+        "15,000+ organic monthly visitors",
+        "Centralized form handler + email pipeline (Next.js + Node.js), Heroku",
+        "AWS SES integration",
+        "Redis sliding-window IP rate limiting + honeypot filtering"
+      ]
+    },
+    {
+      id: "erie",
+      date: "2025-06",
+      company: "Erie Home",
+      role: "Field Marketing Agent",
+      details: [
+        "$148,000 gross revenue sourced",
+        "Top 10 weekly in region (July 2025)"
+      ]
+    },
+    {
+      id: "cook",
+      date: "2022-09",
+      company: "Let’s Cook AIO",
+      role: "Co-Founder",
+      details: [
+        "Subscription community scaled to $11,000+ MRR peak, 838 paid subscribers",
+        "Python Discord bots + MongoDB automation",
+        "Stripe + Whop API integration",
+        "Coordinated 30+ contractors; broader 4,000+ user community"
+      ]
+    }
+  ],
+  leadership: [
+    {
+      id: "blockchain",
+      role: "Vice President of Technology",
+      org: "Boston University Blockchain",
+      period: "May 2025–Present",
+      details: [
+        "Led technical seminars on web3/blockchain",
+        "Coordinated conference/hackathon logistics",
+        "Directed website redesign; managed infrastructure",
+        "Site: bublockchain.com"
+      ],
+      link: "https://bublockchain.com"
+    }
+  ],
+  skills: {
+    languages: ["python", "ts/js", "java", "sql", "solidity", "(c/c++ php asm)"],
+    frameworks: ["react", "nextjs", "node", "flask"],
+    db: ["mongodb", "mysql", "postgres", "supabase"],
+    cloud_devops: ["aws(s3 lambda ec2 ses)", "vercel", "heroku", "git", "redis"],
+    other: ["systems design", "rest apis", "socket.io"]
+  }
+};
+
+// --- COMPONENTS ---
+
+const AsciiFrame = ({ children, className }) => (
+  <motion.div 
+    initial={{ opacity: 0, scale: 0.98 }}
+    whileInView={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.4 }}
+    viewport={{ once: true }}
+    className={clsx("ascii-frame", className)}
+  >
+    <div className="ascii-frame-bl">└</div>
+    <div className="ascii-frame-br">┘</div>
+    {children}
+  </motion.div>
+);
+
+const SectionHeader = ({ title }) => (
+  <motion.h2 
+    initial={{ opacity: 0, x: -20 }}
+    whileInView={{ opacity: 1, x: 0 }}
+    viewport={{ once: true }}
+    className="section-title text-accent mb-6"
+  >
+    {`==[ ${title} ]`.padEnd(40, "=")}
+  </motion.h2>
+);
+
+const NavItem = ({ label, href, active, onClick }) => (
+  <a 
+    href={href}
+    onClick={onClick}
+    className={clsx(
+      "block py-1 px-2 border-l-2 transition-colors duration-200 mt-1",
+      active ? "border-[var(--accent)] text-accent font-bold" : "border-transparent hover:text-accent"
+    )}
+  >
+    {active ? "> " : "  "}
+    {label}
+  </a>
+);
+
+// --- MAIN PAGE ---
+
+export default function Portfolio() {
+  const [activeSection, setActiveSection] = useState("home");
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    const handleScroll = () => {
+      const sections = ["home", "projects", "experience", "leadership", "skills", "contact"];
+      for (const section of sections) {
+        const el = document.getElementById(section);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleNavClick = (e, id) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+      setActiveSection(id);
+    }
+  };
+
+  if (!isClient) return null; // Avoid hydration mismatch
+
+  return (
+    <div className="layout-grid text-sm">
+      
+      {/* SIDEBAR */}
+      <aside className="sidebar">
+        <div>
+          <div className="mb-8 border-b border-[var(--border)] pb-4">
+            <div className="font-bold text-accent mb-1">[user] {RESUME.identity.name.toLowerCase().replace(" ", "_")}</div>
+            <div className="text-muted mb-1">[role] {RESUME.identity.role}</div>
+            <div className="text-xs">[mode] light::ascii</div>
+          </div>
+          
+          <nav className="flex flex-col gap-1">
+            {["home", "projects", "experience", "leadership", "skills", "contact"].map((sec) => (
+              <NavItem 
+                key={sec} 
+                label={sec} 
+                href={`#${sec}`} 
+                active={activeSection === sec}
+                onClick={(e) => handleNavClick(e, sec)}
+              />
+            ))}
+          </nav>
+        </div>
+
+        <div className="mt-8 flex gap-4 text-xs font-mono">
+          <a href={`mailto:${RESUME.identity.email}`} className="hover:text-accent">[mail]</a>
+          <a href={`https://${RESUME.identity.linkedin}`} target="_blank" rel="noopener noreferrer" className="hover:text-accent">[in]</a>
+          <a href={`https://${RESUME.identity.github}`} target="_blank" rel="noopener noreferrer" className="hover:text-accent">[git]</a>
+        </div>
+      </aside>
+
+      {/* MAIN CONTENT */}
+      <main className="main-content">
+        
+        {/* HERO SECTION */}
+        <section id="home" className="min-h-[80vh] flex flex-col justify-center mb-5">
+          <AsciiFrame className="p-8">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h1 className="text-3xl font-bold mb-2">{RESUME.identity.name}</h1>
+              <p className="text-lg text-muted mb-0">Computer Science & Business Minor </p>
+              <p className="text-lg text-muted mb-4">@ Boston University</p>
+              <div className="h-px w-full bg-[var(--border)] my-4 relative">
+                <span className="absolute right-0 top-[-8px] bg-[var(--bg)] px-2 text-xs text-muted">v2.0.26</span>
+              </div>
+              <p className="font-mono text-accent text-xl mb-6">"{RESUME.identity.tagline}"</p>
+            </motion.div>
+          </AsciiFrame>
+
+          {/* Quick Stats Table */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mb-8 font-mono text-xs md:text-sm border border-[var(--border)]"
+          >
+             {RESUME.stats.map((stat, i) => (
+               <div key={stat.label} className="flex border-b border-[var(--border)] last:border-b-0">
+                 <div className="w-24 p-2 border-r border-[var(--border)] bg-gray-50">{stat.label}</div>
+                 <div className="p-2 flex-1">{stat.value}</div>
+               </div>
+             ))}
+          </motion.div>
+
+          <div className="flex flex-col gap-2 font-mono">
+            <button 
+              onClick={(e) => handleNavClick(e, "projects")}
+              className="text-left hover:text-accent group"
+            >
+              <span className="text-accent mr-2">&gt;</span>
+              view_projects
+              <span className="ml-1 opacity-0 group-hover:opacity-100 animate-pulse">_</span>
+            </button>
+            <button 
+              className="text-left hover:text-accent group"
+              onClick={() => { /* TODO: Wire up resume download here */ console.log("Download Resume clicked"); }}
+            >
+              <span className="text-accent mr-2">&gt;</span>
+              download_resume
+            </button>
+            {/* NOTE: Wire up actual PDF download logic in the onClick above. Ensure the file is in /public */}
+          </div>
+        </section>
+
+        {/* PROJECTS SECTION */}
+        <section id="projects" className="mb-5 pt-16">
+          <SectionHeader title="projects" />
+          <div className="flex flex-col gap-8">
+            {RESUME.projects.map((proj, i) => (
+              <ProjectCard key={proj.id} project={proj} index={i} />
+            ))}
+          </div>
+        </section>
+
+        {/* EXPERIENCE SECTION */}
+        <section id="experience" className="mb-5 pt-16">
+          <SectionHeader title="experience" />
+          <div className="flex flex-col gap-8">
+            {RESUME.experience.map((exp, i) => (
+              <ExperienceItem key={exp.id} exp={exp} index={i} />
+            ))}
+          </div>
+        </section>
+
+        {/* LEADERSHIP SECTION */}
+        <section id="leadership" className="mb-5 pt-16">
+          <SectionHeader title="leadership" />
+          {RESUME.leadership.map((lead) => (
+            <AsciiFrame key={lead.id} className="p-6">
+              <div className="flex justify-between flex-wrap gap-2 mb-4 border-b border-dashed border-[var(--border)] pb-2">
+                <h3 className="font-bold text-lg">{lead.org}</h3>
+                <span className="text-muted">{lead.period}</span>
+              </div>
+              <div className="mb-2 text-accent font-bold">:: {lead.role}</div>
+              <ul className="list-none space-y-2 mb-4">
+                {lead.details.map((d, i) => (
+                   <li key={i} className="flex gap-2">
+                     <span className="text-accent">-</span>
+                     <span>{d}</span>
+                   </li>
+                ))}
+              </ul>
+              {lead.link && (
+                <a href={lead.link} target="_blank" rel="noopener noreferrer" className="text-xs hover:text-accent">
+                  [{lead.link.replace("https://", "")}]
+                </a>
+              )}
+            </AsciiFrame>
+          ))}
+        </section>
+
+        {/* SKILLS SECTION */}
+        <section id="skills" className="mb-5 pt-16">
+          <SectionHeader title="skills" />
+          <div className="grid gap-4 font-mono text-sm">
+            {Object.entries(RESUME.skills).map(([category, items], i) => (
+              <motion.div 
+                key={category}
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="flex flex-col md:flex-row border-b border-[var(--border)] last:border-b-0 py-2 hover:bg-gray-50 transition-colors"
+                tabIndex={0}
+              >
+                <div className="w-40 font-bold text-accent mb-1 md:mb-0">
+                  [{category.replace("_", "/")}]
+                </div>
+                <div className="flex-1 text-muted">
+                  {items.join(" | ")}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* CONTACT SECTION */}
+        <section id="contact" className="mb-32 pt-16">
+          <SectionHeader title="contact" />
+          <div className="bg-[var(--panel)] p-6 border border-[var(--border)] font-mono relative overflow-hidden">
+            {/* Scanline effect */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03]" 
+                 style={{ background: "linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))", backgroundSize: "100% 2px, 3px 100%" }}></div>
+            
+            <div className="flex flex-col gap-2 relative z-10">
+              <ContactCommand cmd="email" args={RESUME.identity.email} href={`mailto:${RESUME.identity.email}`} />
+              <ContactCommand cmd="open" args={RESUME.identity.linkedin} href={`https://${RESUME.identity.linkedin}`} />
+              <ContactCommand cmd="open" args={RESUME.identity.github} href={`https://${RESUME.identity.github}`} />
+              <ContactCommand cmd="call" args={RESUME.identity.phone} href={`tel:${RESUME.identity.phone.replace(/\D/g,'')}`} />
+              <ContactCommand 
+                cmd="download_resume" 
+                args="portfolio_v1.pdf" 
+                action={() => { /* Wire up download */ console.log("Download"); }}
+              />
+            </div>
+          </div>
+          <div className="mt-8 text-center text-xs text-muted">
+            :: built in public :: next.js :: ascii-mode ::
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+// --- SUB-COMPONENTS ---
+
+function ProjectCard({ project, index }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      viewport={{ once: true }}
+      className="group"
+    >
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className="cursor-pointer overflow-hidden p-[1px]" // reduced padding to allow border to show? No, just a container.
+      >
+        <div className="relative border border-[var(--border)] p-4 bg-white hover:border-[var(--accent)] transition-colors">
+            {/* ASCII Corners for Header */}
+            <div className="absolute top-[-5px] left-[-1px] bg-white leading-none">┌</div>
+            <div className="absolute top-[-5px] right-[-1px] bg-white leading-none">┐</div>
+            <div className="absolute bottom-[-5px] left-[-1px] bg-white leading-none">└</div>
+            <div className="absolute bottom-[-5px] right-[-1px] bg-white leading-none">┘</div>
+            
+            <div className="flex justify-between items-start md:items-center flex-col md:flex-row gap-2 relative z-10">
+            <div className="font-mono">
+                <span className="text-accent font-bold">[proj]</span> {project.name}
+            </div>
+            <div className="text-xs text-muted md:text-right">
+                :: {project.desc} <span className="text-accent mx-1">-&gt;</span> {project.status}
+            </div>
+            </div>
+        </div>
+      </div>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="mx-[1px] border-x border-b border-[var(--border)] bg-[var(--panel)] relative mt-[-1px] pt-4 pb-2 px-4 mb-4">
+                {/* Connect header to body visually by removing top border overlap effectively done by mt-[-1px] */}
+                <div className="absolute bottom-[-5px] left-[-1px] text-[var(--fg)] leading-none bg-[var(--panel)]">└</div>
+                <div className="absolute bottom-[-5px] right-[-1px] text-[var(--fg)] leading-none bg-[var(--panel)]">┘</div>
+
+                <div className="text-sm">
+                <ul className="space-y-2 mb-4">
+                    {project.details.map((d, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                        <span className="text-accent mt-1">::</span>
+                        <span>{d}</span>
+                    </li>
+                    ))}
+                </ul>
+                {project.link && (
+                    <a href={project.link} target="_blank" rel="noopener noreferrer" className="inline-block border border-[var(--border)] px-3 py-1 hover:bg-[var(--accent)] hover:text-white transition-colors text-xs relative group/btn">
+                    <span className="relative z-10">Review Project Source</span>
+                    </a>
+                )}
+                </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+function ExperienceItem({ exp, index }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.15 }}
+      viewport={{ once: true }}
+      className="group"
+    >
+      <div 
+          onClick={() => setIsOpen(!isOpen)}
+          className="cursor-pointer overflow-hidden p-[1px]" 
+      >
+          <div className="relative border border-[var(--border)] p-4 bg-white hover:border-[var(--accent)] transition-colors">
+              {/* ASCII Corners for Header */}
+              <div className="absolute top-[-5px] left-[-1px] bg-white leading-none">┌</div>
+              <div className="absolute top-[-5px] right-[-1px] bg-white leading-none">┐</div>
+              <div className="absolute bottom-[-5px] left-[-1px] bg-white leading-none">└</div>
+              <div className="absolute bottom-[-5px] right-[-1px] bg-white leading-none">┘</div>
+
+              <div className="flex flex-wrap items-baseline gap-2">
+                  <span className="font-mono font-bold text-accent">[{exp.date}]</span>
+                  <span className="font-bold">{exp.company}</span>
+                  <span className="text-muted text-xs hidden md:inline"> // {exp.role}</span>
+              </div>
+              <div className="md:hidden text-xs text-muted mt-1">{exp.role}</div>
+          </div>
+      </div>
+
+      <AnimatePresence>
+          {isOpen && (
+          <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+          >
+              <div className="mx-[1px] border-x border-b border-[var(--border)] bg-[var(--panel)] relative mt-[-1px] pt-4 pb-2 px-4 mb-4">
+                  <div className="absolute bottom-[-5px] left-[-1px] text-[var(--fg)] leading-none bg-[var(--panel)]">└</div>
+                  <div className="absolute bottom-[-5px] right-[-1px] text-[var(--fg)] leading-none bg-[var(--panel)]">┘</div>
+
+                  <div className="text-sm">
+                  {exp.details.map((d, i) => (
+                      <div key={i} className="mb-1 last:mb-0 flex gap-2">
+                          <span className="text-accent">-</span>
+                          <span>{d}</span>
+                      </div>
+                  ))}
+                  </div>
+              </div>
+          </motion.div>
+          )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+function ContactCommand({ cmd, args, href, action }) {
+  const Content = (
+    <div className="flex items-center gap-3 p-2 hover:bg-[var(--fg)] hover:text-[var(--bg)] group transition-colors cursor-pointer border border-transparent hover:border-[var(--accent)]">
+      <span className="text-accent group-hover:text-[var(--bg)] font-bold">&gt;</span>
+      <span className="font-bold">{cmd}</span>
+      <span className="opacity-70 group-hover:opacity-100">{args}</span>
+    </div>
+  );
+
+  if (href) {
+    return (
+      <a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="block outline-none focus:ring-1 ring-[var(--accent)]">
+        {Content}
+      </a>
+    );
+  }
+  
+  return (
+    <button onClick={action} className="w-full text-left outline-none focus:ring-1 ring-[var(--accent)]">
+      {Content}
+    </button>
+  );
+}
