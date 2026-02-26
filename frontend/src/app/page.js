@@ -177,6 +177,81 @@ const download_resume = () => {
 
 // --- COMPONENTS ---
 
+const LoadingScreen = () => {
+  const [status, setStatus] = useState("initializing_kernel");
+  const [dots, setDots] = useState("");
+
+  useEffect(() => {
+    const statusSequence = [
+      "initializing_js",
+      "loading_assets",
+      "proofreading_resume",
+      "mounting_portfolio_v2",
+      "polishing",
+      "system_ready"
+    ];
+    
+    let current = 0;
+    const interval = setInterval(() => {
+      if (current < statusSequence.length - 1) {
+        current++;
+        setStatus(statusSequence[current]);
+      }
+    }, 400);
+
+    const dotInterval = setInterval(() => {
+      setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
+    }, 300);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(dotInterval);
+    };
+  }, []);
+
+  return (
+    <motion.div 
+      initial={false}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center font-mono p-4"
+      style={{ backgroundColor: '#ffffff', color: '#000000', opacity: 1 }}
+    >
+      <div className="max-w-md w-full">
+        <div className="mb-8 p-4 border-2 border-black relative overflow-hidden">
+          <div className="text-xl md:text-2xl font-bold mb-1">RUSSELL_J // PORTFOLIO_DEVITE</div>
+          <div className="text-xs opacity-60">v{new Date().getFullYear()}.{String(new Date().getMonth() + 1).padStart(2, '0')}.{String(new Date().getDate()).padStart(2, '0')} [STABLE BUILD]</div>
+          <div className="absolute top-0 right-0 p-1 text-[8px] bg-black text-white">SYSTEMID: 0x827A</div>
+        </div>
+
+        <div className="space-y-4 mb-8">
+          <div className="flex items-center gap-2">
+            <span style={{ color: '#0044cc', fontWeight: 'bold' }}>&gt;</span>
+            <span className="uppercase tracking-widest text-sm font-bold">{status}{dots}</span>
+          </div>
+          
+          <div className="w-full bg-gray-100 border border-black h-2 overflow-hidden relative">
+             <motion.div 
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 2.5, ease: "linear" }}
+                className="h-full bg-accent"
+                style={{ backgroundColor: '#0044cc' }}
+             />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 text-[10px] opacity-70 border-t border-black pt-4">
+           <div>CPU: INTEL(R) CORE(TM) I9-13900K</div>
+           <div>MEM: 64.0GB RAM [ OK ]</div>
+           <div>GPU: NVIDIA RTX 4090 [ 0% ]</div>
+           <div>DSK: NVME_SSD_0 [ MOUNTED ]</div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
 const AsciiFrame = ({ children, className }) => (
   <motion.div 
     className={clsx("ascii-frame", className)}
@@ -220,9 +295,26 @@ const NavItem = ({ label, href, active, onClick }) => (
 export default function Portfolio() {
   const [activeSection, setActiveSection] = useState("home");
   const [isClient, setIsClient] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setIsClient(true);
+
+    const handleLoad = () => {
+      // Small timeout to ensure a smooth transition and show off the cool ASCII loader
+      setTimeout(() => setLoading(false), 2600);
+    };
+
+    // If already loaded (e.g. from cache or very fast connection)
+    if (document.readyState === "complete") {
+      handleLoad();
+    } else {
+      window.addEventListener("load", handleLoad);
+    }
+
+    // Fail-safe: if load event fails to fire for some reason, clear after 5s
+    const failSafe = setTimeout(handleLoad, 5000);
+
     const handleScroll = () => {
       const sections = ["home", "projects", "experience", "leadership", "skills", "contact"];
       for (const section of sections) {
@@ -237,7 +329,11 @@ export default function Portfolio() {
       }
     };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("load", handleLoad);
+      window.removeEventListener("scroll", handleScroll);
+      clearTimeout(failSafe);
+    }
   }, []);
 
   const handleNavClick = (e, id) => {
@@ -249,13 +345,26 @@ export default function Portfolio() {
     }
   };
 
-  if (!isClient) return null; // Avoid hydration mismatch
-
   return (
-    <div className="layout-grid text-sm">
-      
-      {/* SIDEBAR */}
-      <aside className="sidebar">
+    <>
+      <AnimatePresence>
+        {loading && <LoadingScreen key="loader" />}
+      </AnimatePresence>
+
+      <motion.div 
+        key="content"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: (isClient && !loading) ? 1 : 0 }}
+        transition={{ duration: 0.8 }}
+        className="layout-grid text-sm"
+        style={{ 
+          height: loading ? '100vh' : 'auto', 
+          overflow: loading ? 'hidden' : 'visible' 
+        }}
+      >
+          
+          {/* SIDEBAR */}
+          <aside className="sidebar">
         <div>
           <div className="mb-8 border-b border-[var(--border)] pb-4">
             <div className="font-bold text-accent mb-1">[user] {RESUME.identity.name.toLowerCase().replace(" ", "_")}</div>
@@ -425,7 +534,8 @@ export default function Portfolio() {
           </div>
         </section>
       </main>
-    </div>
+      </motion.div>
+    </>
   );
 }
 
