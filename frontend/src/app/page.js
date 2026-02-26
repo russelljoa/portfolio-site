@@ -16,17 +16,18 @@ const RESUME = {
     name: "Russell Joarder",
     role: "cs_undergrad",
     location: "West Chester, PA",
-    email: "rjoarder@bu.edu",
-    phone: "(484) 983-2295",
     github: "github.com/russelljoa",
     linkedin: "linkedin.com/in/russell-joarder",
+    instagram: "instagram.com/russell.joar",
     tagline: "I build systems + ship products"
   },
   stats: [
-    { label: "gpa", value: "3.7/4.0" },
+    { label: "home", value: "West Chester, PA | Boston, MA" },
     { label: "grad", value: "May 2028" },
     { label: "stack", value: "nextjs node aws mongo" },
-    { label: "scale", value: "100+ users / 2.1TB" }
+    { label: "major", value: "Computer Science" },
+    { label: "minor", value: "Business Administration & Management"}
+
   ],
   projects: [
     {
@@ -41,7 +42,8 @@ const RESUME = {
         "Scaled to 100+ users and 2.1TB total transfers",
         "S3 signed URLs and backend access controls"
       ],
-      link: "https://parrotdrop.com" // assumed based on resume text
+      link: "https://parrotdrop.com",
+      linkName: "Visit Site"
     },
     {
       id: "wordle",
@@ -54,8 +56,23 @@ const RESUME = {
         "≈95% solve rate across word pool",
         "Automated testing framework for constraints/heuristics"
       ],
-      link: "https://github.com/russelljoa/wordle-solver"
-    }
+      link: "https://github.com/russelljoa/wordle-solver",
+      linkName: "View Source"
+    },
+    {
+      id: "westtown-school-dining-menu",
+      name: "github.com/russelljoa/Westtown-School-Dining-Menu",
+      desc: "school cafeteria menu w/ backend",
+      status: "complete",
+      details: [
+        "Web interface for presenting dining menus for Westtown School",
+        "Built with HTML, PHP, JavaScript, and CSS for dynamic menu rendering",
+        "Includes backend (e.g., PHP) and for menu building for kitchen staff",
+        "Only accessible within Westtown's secure network environment"
+      ],
+      link: "https://github.com/russelljoa/Westtown-School-Dining-Menu",
+      linkName: "View Source"
+  }
   ],
   experience: [
     {
@@ -118,14 +135,22 @@ const RESUME = {
   }
 };
 
+// --- UTILITY FUNCTIONS ---
+
+const download_resume = () => {
+  const resumePath = "/russell.joarder_resume_2026.pdf";
+  const link = document.createElement("a");
+  link.href = resumePath;
+  link.download = "russell.joarder_resume_2026.pdf";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 // --- COMPONENTS ---
 
 const AsciiFrame = ({ children, className }) => (
   <motion.div 
-    initial={{ opacity: 0, scale: 0.98 }}
-    whileInView={{ opacity: 1, scale: 1 }}
-    transition={{ duration: 0.4 }}
-    viewport={{ once: true }}
     className={clsx("ascii-frame", className)}
   >
     <div className="ascii-frame-bl">└</div>
@@ -136,12 +161,9 @@ const AsciiFrame = ({ children, className }) => (
 
 const SectionHeader = ({ title }) => (
   <motion.h2 
-    initial={{ opacity: 0, x: -20 }}
-    whileInView={{ opacity: 1, x: 0 }}
-    viewport={{ once: true }}
     className="section-title text-accent mb-6"
   >
-    {`==[ ${title} ]`.padEnd(40, "=")}
+    {`===[ ${title} ]===`}
   </motion.h2>
 );
 
@@ -150,12 +172,13 @@ const NavItem = ({ label, href, active, onClick }) => (
     href={href}
     onClick={onClick}
     className={clsx(
-      "block py-1 px-2 border-l-2 transition-colors duration-200 mt-1",
+      "block py-1 px-2 border-l-2 transition-colors duration-200 mt-1 group",
       active ? "border-[var(--accent)] text-accent font-bold" : "border-transparent hover:text-accent"
     )}
   >
     {active ? "> " : "  "}
     {label}
+    {!active && <span className="opacity-0 group-hover:opacity-100 animate-pulse">_</span>}
   </a>
 );
 
@@ -221,9 +244,9 @@ export default function Portfolio() {
         </div>
 
         <div className="mt-8 flex gap-4 text-xs font-mono">
-          <a href={`mailto:${RESUME.identity.email}`} className="hover:text-accent">[mail]</a>
-          <a href={`https://${RESUME.identity.linkedin}`} target="_blank" rel="noopener noreferrer" className="hover:text-accent">[in]</a>
-          <a href={`https://${RESUME.identity.github}`} target="_blank" rel="noopener noreferrer" className="hover:text-accent">[git]</a>
+          <a href={`mailto:${RESUME.identity.email}`} className="hover:text-accent group">[mail]<span className="opacity-0 group-hover:opacity-100 animate-pulse">_</span></a>
+          <a href={`https://${RESUME.identity.linkedin}`} target="_blank" rel="noopener noreferrer" className="hover:text-accent group">[in]<span className="opacity-0 group-hover:opacity-100 animate-pulse">_</span></a>
+          <a href={`https://${RESUME.identity.github}`} target="_blank" rel="noopener noreferrer" className="hover:text-accent group">[git]<span className="opacity-0 group-hover:opacity-100 animate-pulse">_</span></a>
         </div>
       </aside>
 
@@ -233,16 +256,11 @@ export default function Portfolio() {
         {/* HERO SECTION */}
         <section id="home" className="min-h-[80vh] flex flex-col justify-center mb-5">
           <AsciiFrame className="p-8">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
+            <motion.div>
               <h1 className="text-3xl font-bold mb-2">{RESUME.identity.name}</h1>
-              <p className="text-lg text-muted mb-0">Computer Science & Business Minor </p>
-              <p className="text-lg text-muted mb-4">@ Boston University</p>
+              <p className="text-lg text-muted mb-4">CS & BIZ @ Boston University</p>
               <div className="h-px w-full bg-[var(--border)] my-4 relative">
-                <span className="absolute right-0 top-[-8px] bg-[var(--bg)] px-2 text-xs text-muted">v2.0.26</span>
+                <span className="absolute right-0 top-[-8px] bg-[var(--bg)] px-2 text-xs text-muted">v{new Date().getMonth() + 1}.0.{String(new Date().getFullYear()).slice(-2)}</span>
               </div>
               <p className="font-mono text-accent text-xl mb-6">"{RESUME.identity.tagline}"</p>
             </motion.div>
@@ -250,14 +268,11 @@ export default function Portfolio() {
 
           {/* Quick Stats Table */}
           <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
             className="mb-8 font-mono text-xs md:text-sm border border-[var(--border)]"
           >
              {RESUME.stats.map((stat, i) => (
                <div key={stat.label} className="flex border-b border-[var(--border)] last:border-b-0">
-                 <div className="w-24 p-2 border-r border-[var(--border)] bg-gray-50">{stat.label}</div>
+                 <div className="w-min whitespace-nowrap p-2 border-r border-[var(--border)] bg-gray-50">{stat.label}</div>
                  <div className="p-2 flex-1">{stat.value}</div>
                </div>
              ))}
@@ -274,10 +289,11 @@ export default function Portfolio() {
             </button>
             <button 
               className="text-left hover:text-accent group"
-              onClick={() => { /* TODO: Wire up resume download here */ console.log("Download Resume clicked"); }}
+              onClick={download_resume}
             >
               <span className="text-accent mr-2">&gt;</span>
               download_resume
+              <span className="ml-1 opacity-0 group-hover:opacity-100 animate-pulse">_</span>
             </button>
             {/* NOTE: Wire up actual PDF download logic in the onClick above. Ensure the file is in /public */}
           </div>
@@ -335,21 +351,18 @@ export default function Portfolio() {
           <SectionHeader title="skills" />
           <div className="grid gap-4 font-mono text-sm">
             {Object.entries(RESUME.skills).map(([category, items], i) => (
-              <motion.div 
+              <div 
                 key={category}
-                initial={{ opacity: 0, x: -10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="flex flex-col md:flex-row border-b border-[var(--border)] last:border-b-0 py-2 hover:bg-gray-50 transition-colors"
+                className="flex flex-col md:flex-row border-b border-[var(--border)] last:border-b-0 py-2 pr-3 hover:bg-gray-50 transition-colors"
                 tabIndex={0}
               >
-                <div className="w-40 font-bold text-accent mb-1 md:mb-0">
+                <div className="w-40 font-bold text-accent mb-1 md:mb-0 pr-2">
                   [{category.replace("_", "/")}]
                 </div>
                 <div className="flex-1 text-muted">
                   {items.join(" | ")}
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </section>
@@ -357,25 +370,25 @@ export default function Portfolio() {
         {/* CONTACT SECTION */}
         <section id="contact" className="mb-32 pt-16">
           <SectionHeader title="contact" />
-          <div className="bg-[var(--panel)] p-6 border border-[var(--border)] font-mono relative overflow-hidden">
+          <div className="bg-[var(--panel)] p-3 border border-[var(--border)] font-mono relative overflow-hidden">
             {/* Scanline effect */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.03]" 
                  style={{ background: "linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))", backgroundSize: "100% 2px, 3px 100%" }}></div>
             
             <div className="flex flex-col gap-2 relative z-10">
-              <ContactCommand cmd="email" args={RESUME.identity.email} href={`mailto:${RESUME.identity.email}`} />
-              <ContactCommand cmd="open" args={RESUME.identity.linkedin} href={`https://${RESUME.identity.linkedin}`} />
-              <ContactCommand cmd="open" args={RESUME.identity.github} href={`https://${RESUME.identity.github}`} />
-              <ContactCommand cmd="call" args={RESUME.identity.phone} href={`tel:${RESUME.identity.phone.replace(/\D/g,'')}`} />
+              <ContactCommand cmd="email_me" args="&#114;&#106;&#111;&#97;&#114;&#100;&#101;&#114;&#64;&#98;&#117;&#46;&#101;&#100;&#117;" href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#114;&#106;&#111;&#97;&#114;&#100;&#101;&#114;&#64;&#98;&#117;&#46;&#101;&#100;&#117;" />
+              <ContactCommand cmd="connect_on" args={RESUME.identity.linkedin} href={`https://${RESUME.identity.linkedin}`} />
+              <ContactCommand cmd="check_out" args={RESUME.identity.github} href={`https://${RESUME.identity.github}`} />
+              <ContactCommand cmd="add_me" args={RESUME.identity.instagram} href={`https://${RESUME.identity.instagram}`} />
               <ContactCommand 
                 cmd="download_resume" 
                 args="portfolio_v1.pdf" 
-                action={() => { /* Wire up download */ console.log("Download"); }}
+                action={download_resume}
               />
             </div>
           </div>
           <div className="mt-8 text-center text-xs text-muted">
-            :: built in public :: next.js :: ascii-mode ::
+            :: connect with me pls ::
           </div>
         </section>
       </main>
@@ -390,15 +403,11 @@ function ProjectCard({ project, index }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      viewport={{ once: true }}
       className="group"
     >
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className="cursor-pointer overflow-hidden p-[1px]" // reduced padding to allow border to show? No, just a container.
+        className="cursor-pointer overflow-hidden p-[1px]"
       >
         <div className="relative border border-[var(--border)] p-4 bg-white hover:border-[var(--accent)] transition-colors">
             {/* ASCII Corners for Header */}
@@ -408,12 +417,25 @@ function ProjectCard({ project, index }) {
             <div className="absolute bottom-[-5px] right-[-1px] bg-white leading-none">┘</div>
             
             <div className="flex justify-between items-start md:items-center flex-col md:flex-row gap-2 relative z-10">
-            <div className="font-mono">
-                <span className="text-accent font-bold">[proj]</span> {project.name}
-            </div>
-            <div className="text-xs text-muted md:text-right">
-                :: {project.desc} <span className="text-accent mx-1">-&gt;</span> {project.status}
-            </div>
+              <div className="flex-1">
+                <div className="font-mono">
+                    <span className="text-accent font-bold">[proj]</span> {project.name}
+                </div>
+                <div className="text-xs text-muted mt-1">
+                    :: {project.desc} <span className="text-accent mx-1">-&gt;</span> {project.status}
+                </div>
+              </div>
+              {project.link && (
+                <a 
+                  href={project.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="whitespace-nowrap border border-[var(--border)] px-3 py-1 hover:bg-[var(--accent)] hover:text-white transition-colors text-xs"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {project.linkName}
+                </a>
+              )}
             </div>
         </div>
       </div>
@@ -421,12 +443,9 @@ function ProjectCard({ project, index }) {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="mx-[1px] border-x border-b border-[var(--border)] bg-[var(--panel)] relative mt-[-1px] pt-4 pb-2 px-4 mb-4">
+            <div className="mx-[1px] border-x border-b border-[var(--border)] bg-[var(--panel)] relative mt-[-1px] pt-4 pb-2 px-6 mb-4 px-3">
                 {/* Connect header to body visually by removing top border overlap effectively done by mt-[-1px] */}
                 <div className="absolute bottom-[-5px] left-[-1px] text-[var(--fg)] leading-none bg-[var(--panel)]">└</div>
                 <div className="absolute bottom-[-5px] right-[-1px] text-[var(--fg)] leading-none bg-[var(--panel)]">┘</div>
@@ -435,16 +454,11 @@ function ProjectCard({ project, index }) {
                 <ul className="space-y-2 mb-4">
                     {project.details.map((d, i) => (
                     <li key={i} className="flex items-start gap-2">
-                        <span className="text-accent mt-1">::</span>
+                        <span className="text-accent mb-2">::</span>
                         <span>{d}</span>
                     </li>
                     ))}
                 </ul>
-                {project.link && (
-                    <a href={project.link} target="_blank" rel="noopener noreferrer" className="inline-block border border-[var(--border)] px-3 py-1 hover:bg-[var(--accent)] hover:text-white transition-colors text-xs relative group/btn">
-                    <span className="relative z-10">Review Project Source</span>
-                    </a>
-                )}
                 </div>
             </div>
           </motion.div>
@@ -459,10 +473,6 @@ function ExperienceItem({ exp, index }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.15 }}
-      viewport={{ once: true }}
       className="group"
     >
       <div 
@@ -488,12 +498,9 @@ function ExperienceItem({ exp, index }) {
       <AnimatePresence>
           {isOpen && (
           <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
           >
-              <div className="mx-[1px] border-x border-b border-[var(--border)] bg-[var(--panel)] relative mt-[-1px] pt-4 pb-2 px-4 mb-4">
+              <div className="mx-[1px] border-x border-b border-[var(--border)] bg-[var(--panel)] relative mt-[-1px] pt-4 pb-2 px-6 mb-5 px-3">
                   <div className="absolute bottom-[-5px] left-[-1px] text-[var(--fg)] leading-none bg-[var(--panel)]">└</div>
                   <div className="absolute bottom-[-5px] right-[-1px] text-[var(--fg)] leading-none bg-[var(--panel)]">┘</div>
 
