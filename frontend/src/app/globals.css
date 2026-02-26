@@ -153,15 +153,8 @@ a:hover, button:hover {
 
 /* Layout Grid */
 .layout-grid {
-  display: grid;
-  grid-template-columns: 240px 1fr;
+  position: relative;
   min-height: 100vh;
-}
-
-@media (max-width: 768px) {
-  .layout-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* Sidebar Styles */
@@ -171,7 +164,6 @@ a:hover, button:hover {
   left: 0;
   width: 240px;
   height: 100vh;
-  border-right: 1px solid var(--border);
   padding: 1.5rem;
   background: var(--bg);
   z-index: 50;
@@ -188,15 +180,20 @@ a:hover, button:hover {
 
 /* Main Content */
 .main-content {
-  grid-column: 2;
   padding: 2rem 3rem 4rem 3rem;
   min-width: 0; /* Prevents overflow */
+  width: min(1080px, calc(100% - (240px + 48px)));
+  max-width: 1080px;
+  margin-left: calc(240px + 16px);
+  margin-right: auto;
 }
 
 @media (max-width: 768px) {
   .main-content {
-    grid-column: 1;
     padding: 1.5rem;
+    border-right: 0;
+    width: 100%;
+    margin-left: 0;
   }
 }
 

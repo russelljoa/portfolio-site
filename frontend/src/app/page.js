@@ -436,7 +436,7 @@ export default function Portfolio() {
           </AsciiFrame>
 
           {/* Quick Stats Table */}
-          <motion.div 
+          <div 
             className="mb-8 font-mono text-xs md:text-sm border border-[var(--border)]"
           >
              {RESUME.stats.map((stat, i) => (
@@ -445,7 +445,7 @@ export default function Portfolio() {
                  <div className="p-2 flex-1">{stat.value}</div>
                </div>
              ))}
-          </motion.div>
+          </div>
 
           <div className="flex flex-col gap-2 font-mono">
             <button 
@@ -546,7 +546,6 @@ export default function Portfolio() {
             
             <div className="flex flex-col gap-2 relative z-10">
               <ContactCommand cmd="email_me" args="&#114;&#106;&#111;&#97;&#114;&#100;&#101;&#114;&#64;&#98;&#117;&#46;&#101;&#100;&#117;" href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#114;&#106;&#111;&#97;&#114;&#100;&#101;&#114;&#64;&#98;&#117;&#46;&#101;&#100;&#117;" />
-              <ContactCommand cmd="connect_on" args={RESUME.identity.linkedin} href={`https://${RESUME.identity.linkedin}`} />
               <ContactCommand cmd="check_out" args={RESUME.identity.github} href={`https://${RESUME.identity.github}`} />
               <ContactCommand cmd="add_me" args={RESUME.identity.instagram} href={`https://${RESUME.identity.instagram}`} />
               <ContactCommand 
@@ -554,6 +553,7 @@ export default function Portfolio() {
                 args="portfolio_v1.pdf" 
                 action={download_resume}
               />
+              <ContactCommand cmd="connect_on" args={RESUME.identity.linkedin} href={`https://${RESUME.identity.linkedin}`} />
             </div>
           </div>
           <div className="mt-8 text-center text-xs text-muted">
@@ -691,7 +691,7 @@ function ExperienceItem({ exp, index }) {
 
 function ContactCommand({ cmd, args, href, action }) {
   const Content = (
-    <div className="flex items-center gap-3 p-2 hover:bg-[var(--fg)] hover:text-[var(--bg)] group transition-colors cursor-pointer border border-transparent hover:border-[var(--accent)]">
+    <div className="flex items-start gap-3 p-2 hover:bg-[var(--fg)] hover:text-[var(--bg)] group transition-colors cursor-pointer border border-transparent hover:border-[var(--accent)]">
       <span className="text-accent group-hover:text-[var(--bg)] font-bold">&gt;</span>
       <span className="font-bold">{cmd}</span>
       <span className="opacity-70 group-hover:opacity-100">{args}</span>
