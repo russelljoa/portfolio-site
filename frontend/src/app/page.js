@@ -295,7 +295,7 @@ const SectionHeader = ({ title, showExpandHint = false }) => (
       {`===[ ${title} ]===`}
     </motion.h2>
     {showExpandHint && (
-      <p className="text-xs text-muted mt-2">click a box to expand</p>
+      <p className="text-xs text-muted mt-2">click a box to see details</p>
     )}
   </div>
 );
