@@ -51,6 +51,7 @@ body {
   gap: 1.5rem;
   align-items: center;
   width: min(520px, 100%);
+  transform: translateY(-6vh);
 }
 
 .loading-title {
