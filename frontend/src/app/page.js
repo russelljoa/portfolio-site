@@ -57,12 +57,40 @@ const RESUME = {
         "Automated testing framework for constraints/heuristics"
       ],
       link: "https://github.com/russelljoa/wordle-solver",
-      linkName: "View Source"
+      linkName: "View GitHub"
+    },
+    {
+      id: "engagemint",
+      name: "github.com/russelljoa/EngageMint",
+      desc: "creator rewards platform",
+      status: "hackathon",
+      details: [
+        "EasyA x Harvard x Polkadot hackathon project for tokenized fan engagement",
+        "Lets creators mint ERC-20-style rewards on Polkadot AssetHub and gate minting to admins",
+        "Frontend flows (login/home/merch/videos/extension) for distributing tasks that earn tokens",
+        "Verified on-chain mints via Subscan explorer; built with Solidity, Rust, and JavaScript"
+      ],
+      link: "https://github.com/russelljoa/EngageMint",
+      linkName: "View GitHub"
+    },
+    {
+      id: "swap-squad",
+      name: "Swap Squad",
+      desc: "decentralized p2p marketplace",
+      status: "hackathon",
+      details: [
+        "Decentralized peer-to-peer marketplace on the TRON blockchain with competitive fees",
+        "Smart contract w/ Solidity on TRON, React & Flask for UI & backend",
+        "Achieved 2nd Place Prize Winner at Hackathon",
+        "Leveraged Solidity to build the smart contract on TRON to ensure security, transparency, reliability"
+      ],
+      link: "https://github.com/russelljoa/SwapSquad",
+      linkName: "View GitHub"
     },
     {
       id: "westtown-school-dining-menu",
       name: "github.com/russelljoa/Westtown-School-Dining-Menu",
-      desc: "school cafeteria menu w/ backend",
+      desc: "cafeteria menu",
       status: "complete",
       details: [
         "Web interface for presenting dining menus for Westtown School",
@@ -71,7 +99,7 @@ const RESUME = {
         "Only accessible within Westtown's secure network environment"
       ],
       link: "https://github.com/russelljoa/Westtown-School-Dining-Menu",
-      linkName: "View Source"
+      linkName: "View GitHub"
   }
   ],
   experience: [
@@ -116,7 +144,7 @@ const RESUME = {
       id: "blockchain",
       role: "Vice President of Technology",
       org: "Boston University Blockchain",
-      period: "May 2025–Present",
+      period: "May 2025-Present",
       details: [
         "Led technical seminars on web3/blockchain",
         "Coordinated conference/hackathon logistics",
@@ -159,12 +187,17 @@ const AsciiFrame = ({ children, className }) => (
   </motion.div>
 );
 
-const SectionHeader = ({ title }) => (
-  <motion.h2 
-    className="section-title text-accent mb-6"
-  >
-    {`===[ ${title} ]===`}
-  </motion.h2>
+const SectionHeader = ({ title, showExpandHint = false }) => (
+  <div className={clsx("mb-6", showExpandHint && "pb-2")}>
+    <motion.h2 
+      className="section-title text-accent"
+    >
+      {`===[ ${title} ]===`}
+    </motion.h2>
+    {showExpandHint && (
+      <p className="text-xs text-muted mt-2">click a box to expand</p>
+    )}
+  </div>
 );
 
 const NavItem = ({ label, href, active, onClick }) => (
@@ -301,7 +334,7 @@ export default function Portfolio() {
 
         {/* PROJECTS SECTION */}
         <section id="projects" className="mb-5 pt-16">
-          <SectionHeader title="projects" />
+          <SectionHeader title="projects" showExpandHint />
           <div className="flex flex-col gap-8">
             {RESUME.projects.map((proj, i) => (
               <ProjectCard key={proj.id} project={proj} index={i} />
@@ -311,7 +344,7 @@ export default function Portfolio() {
 
         {/* EXPERIENCE SECTION */}
         <section id="experience" className="mb-5 pt-16">
-          <SectionHeader title="experience" />
+          <SectionHeader title="experience" showExpandHint />
           <div className="flex flex-col gap-8">
             {RESUME.experience.map((exp, i) => (
               <ExperienceItem key={exp.id} exp={exp} index={i} />
@@ -324,7 +357,7 @@ export default function Portfolio() {
           <SectionHeader title="leadership" />
           {RESUME.leadership.map((lead) => (
             <AsciiFrame key={lead.id} className="p-6">
-              <div className="flex justify-between flex-wrap gap-2 mb-4 border-b border-dashed border-[var(--border)] pb-2">
+              <div className="flex justify-between flex-wrap gap-2 mb-4 border-b border-dashed border-[var(--border)] pb-2 px-2">
                 <h3 className="font-bold text-lg">{lead.org}</h3>
                 <span className="text-muted">{lead.period}</span>
               </div>
@@ -356,7 +389,7 @@ export default function Portfolio() {
                 className="flex flex-col md:flex-row border-b border-[var(--border)] last:border-b-0 py-2 pr-3 hover:bg-gray-50 transition-colors"
                 tabIndex={0}
               >
-                <div className="w-40 font-bold text-accent mb-1 md:mb-0 pr-2">
+                <div className="w-40 font-bold text-accent mb-1 md:mb-0 mr-2">
                   [{category.replace("_", "/")}]
                 </div>
                 <div className="flex-1 text-muted">
@@ -370,7 +403,7 @@ export default function Portfolio() {
         {/* CONTACT SECTION */}
         <section id="contact" className="mb-32 pt-16">
           <SectionHeader title="contact" />
-          <div className="bg-[var(--panel)] p-3 border border-[var(--border)] font-mono relative overflow-hidden">
+          <div className="bg-[var(--panel)] p-3 border border-[var(--border)] font-mono relative overflow-hidden ">
             {/* Scanline effect */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.03]" 
                  style={{ background: "linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))", backgroundSize: "100% 2px, 3px 100%" }}></div>
@@ -491,7 +524,6 @@ function ExperienceItem({ exp, index }) {
                   <span className="font-bold">{exp.company}</span>
                   <span className="text-muted text-xs hidden md:inline"> // {exp.role}</span>
               </div>
-              <div className="md:hidden text-xs text-muted mt-1">{exp.role}</div>
           </div>
       </div>
 
