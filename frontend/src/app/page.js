@@ -19,7 +19,7 @@ const RESUME = {
     github: "github.com/russelljoa",
     linkedin: "linkedin.com/in/russell-joarder",
     instagram: "instagram.com/russell.joar",
-    tagline: "I build systems + ship products"
+    tagline: "always building"
   },
   stats: [
     { label: "home", value: "West Chester, PA | Boston, MA" },
@@ -177,25 +177,40 @@ const download_resume = () => {
 
 // --- COMPONENTS ---
 
-const LoadingScreen = () => {
-  const [status, setStatus] = useState("initializing_kernel");
+const LoadingScreen = ({ isReady }) => {
+  const statusSequence = [
+    "initializing_kernel",
+    "initializing_js",
+    "loading_assets",
+    "proofreading_resume",
+    "mounting_portfolio_v2",
+    "polishing",
+    "system_ready"
+  ];
+
+  const [status, setStatus] = useState(statusSequence[0]);
   const [dots, setDots] = useState("");
+  const [barStep, setBarStep] = useState(0);
+  const [statusLocked, setStatusLocked] = useState(false);
+  const barLength = 18;
 
   useEffect(() => {
-    const statusSequence = [
-      "initializing_js",
-      "loading_assets",
-      "proofreading_resume",
-      "mounting_portfolio_v2",
-      "polishing",
-      "system_ready"
-    ];
-    
+    if (statusLocked) return;
+
     let current = 0;
     const interval = setInterval(() => {
+      if (statusLocked) {
+        clearInterval(interval);
+        return;
+      }
       if (current < statusSequence.length - 1) {
         current++;
-        setStatus(statusSequence[current]);
+        const nextStatus = statusSequence[current];
+        setStatus(nextStatus);
+        if (nextStatus === statusSequence[statusSequence.length - 1]) {
+          setStatusLocked(true);
+          clearInterval(interval);
+        }
       }
     }, 400);
 
@@ -207,45 +222,55 @@ const LoadingScreen = () => {
       clearInterval(interval);
       clearInterval(dotInterval);
     };
-  }, []);
+  }, [statusLocked]);
+
+  useEffect(() => {
+    const target = isReady ? barLength : barLength - 1;
+    if (isReady) {
+      if (barStep < barLength) setBarStep(barLength); // finish instantly when ready
+      setStatus(statusSequence[statusSequence.length - 1]);
+      setDots("");
+      setStatusLocked(true);
+      return;
+    }
+    if (barStep >= target) return;
+    const delay = 60 + Math.random() * 320; // wider jitter for more natural feel
+    const timeoutId = setTimeout(() => {
+      setBarStep((prev) => Math.min(prev + 1, target));
+    }, delay);
+    return () => clearTimeout(timeoutId);
+  }, [barStep, isReady]);
+
+  const fill = "=".repeat(Math.min(barStep, barLength));
+  const empty = " ".repeat(Math.max(barLength - fill.length, 0));
+  const asciiBar = (
+    <>
+      <span className="loading-ascii-bracket">[</span>
+      <span className="loading-ascii-fill">{fill}</span>
+      <span className="loading-ascii-empty">{empty}</span>
+      <span className="loading-ascii-bracket">]</span>
+    </>
+  );
 
   return (
     <motion.div 
       initial={false}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center font-mono p-4"
-      style={{ backgroundColor: '#ffffff', color: '#000000', opacity: 1 }}
+      className="loading-screen"
     >
-      <div className="max-w-md w-full">
-        <div className="mb-8 p-4 border-2 border-black relative overflow-hidden">
-          <div className="text-xl md:text-2xl font-bold mb-1">RUSSELL_J // PORTFOLIO_DEVITE</div>
-          <div className="text-xs opacity-60">v{new Date().getFullYear()}.{String(new Date().getMonth() + 1).padStart(2, '0')}.{String(new Date().getDate()).padStart(2, '0')} [STABLE BUILD]</div>
-          <div className="absolute top-0 right-0 p-1 text-[8px] bg-black text-white">SYSTEMID: 0x827A</div>
-        </div>
-
-        <div className="space-y-4 mb-8">
-          <div className="flex items-center gap-2">
-            <span style={{ color: '#0044cc', fontWeight: 'bold' }}>&gt;</span>
-            <span className="uppercase tracking-widest text-sm font-bold">{status}{dots}</span>
-          </div>
-          
-          <div className="w-full bg-gray-100 border border-black h-2 overflow-hidden relative">
-             <motion.div 
-                initial={{ width: "0%" }}
-                animate={{ width: "100%" }}
-                transition={{ duration: 2.5, ease: "linear" }}
-                className="h-full bg-accent"
-                style={{ backgroundColor: '#0044cc' }}
-             />
+      <div className="loading-shell">
+        <div className="flex flex-col items-center gap-2">
+          <div className="loading-title">loading</div>
+          <div className="loading-status" aria-live="polite">
+            <span className="loading-status-text">{status}</span>
+            <span className="loading-status-dots" aria-hidden="true">{dots}</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 text-[10px] opacity-70 border-t border-black pt-4">
-           <div>CPU: INTEL(R) CORE(TM) I9-13900K</div>
-           <div>MEM: 64.0GB RAM [ OK ]</div>
-           <div>GPU: NVIDIA RTX 4090 [ 0% ]</div>
-           <div>DSK: NVME_SSD_0 [ MOUNTED ]</div>
+        <div className="loading-ascii" aria-label="loading progress">
+          <div className="loading-ascii-label">progress</div>
+          <div className="loading-ascii-bar" aria-live="polite">{asciiBar}</div>
         </div>
       </div>
     </motion.div>
@@ -296,13 +321,15 @@ export default function Portfolio() {
   const [activeSection, setActiveSection] = useState("home");
   const [isClient, setIsClient] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [contentReady, setContentReady] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
 
     const handleLoad = () => {
-      // Small timeout to ensure a smooth transition and show off the cool ASCII loader
-      setTimeout(() => setLoading(false), 2600);
+      // Mark content ready, show the final filled state briefly, then exit
+      setContentReady(true);
+      setTimeout(() => setLoading(false), 220);
     };
 
     // If already loaded (e.g. from cache or very fast connection)
@@ -348,7 +375,7 @@ export default function Portfolio() {
   return (
     <>
       <AnimatePresence>
-        {loading && <LoadingScreen key="loader" />}
+        {loading && <LoadingScreen key="loader" isReady={contentReady} />}
       </AnimatePresence>
 
       <motion.div 
@@ -514,8 +541,8 @@ export default function Portfolio() {
           <SectionHeader title="contact" />
           <div className="bg-[var(--panel)] p-3 border border-[var(--border)] font-mono relative overflow-hidden ">
             {/* Scanline effect */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.03]" 
-                 style={{ background: "linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))", backgroundSize: "100% 2px, 3px 100%" }}></div>
+              <div className="absolute inset-0 pointer-events-none opacity-[0.03]" 
+                style={{ background: "linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))", backgroundSize: "100% 2px, 6px 100%" }}></div>
             
             <div className="flex flex-col gap-2 relative z-10">
               <ContactCommand cmd="email_me" args="&#114;&#106;&#111;&#97;&#114;&#100;&#101;&#114;&#64;&#98;&#117;&#46;&#101;&#100;&#117;" href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#114;&#106;&#111;&#97;&#114;&#100;&#101;&#114;&#64;&#98;&#117;&#46;&#101;&#100;&#117;" />
