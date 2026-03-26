@@ -547,7 +547,6 @@ export default function Portfolio() {
             <div className="flex flex-col gap-2 relative z-10">
               <ContactCommand cmd="email_me" args="&#114;&#106;&#111;&#97;&#114;&#100;&#101;&#114;&#64;&#98;&#117;&#46;&#101;&#100;&#117;" href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#114;&#106;&#111;&#97;&#114;&#100;&#101;&#114;&#64;&#98;&#117;&#46;&#101;&#100;&#117;" />
               <ContactCommand cmd="check_out" args={RESUME.identity.github} href={`https://${RESUME.identity.github}`} />
-              <ContactCommand cmd="add_me" args={RESUME.identity.instagram} href={`https://${RESUME.identity.instagram}`} />
               <ContactCommand 
                 cmd="download_resume" 
                 args="portfolio_v1.pdf" 
