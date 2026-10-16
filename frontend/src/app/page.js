@@ -31,6 +31,20 @@ const RESUME = {
   ],
   projects: [
     {
+      id: "polymarket-bitcoin-trader",
+      name: "Polymarket Sentiment Bitcoin Data Platform",
+      desc: "quantitative crypto trading platform",
+      status: "August 2026",
+      details: [
+        "Architected a Python-based quantitative trading data platform processing data from 5 crypto exchange data sources, enabling cryptocurrency and prediction market research",
+        "Built a backtesting CLI tool for strategy testing",
+        "Developed concurrent data ingestion and processing pipelines using asyncio, multithreading, REST APIs, and WebSockets",
+        "Aggregated high-frequency, millisecond-level, time-adjusted prediction market data for statistical modeling"
+      ],
+      link: "https://github.com/russelljoa/turkeytrader",
+      linkName: "View GitHub"
+    },
+    {
       id: "parrot",
       name: "parrotdrop.com",
       desc: "media sharing platform",
@@ -47,7 +61,7 @@ const RESUME = {
     },
     {
       id: "wordle",
-      name: "github.com/russelljoa/wordle-solver",
+      name: "Wordle Solver",
       desc: "python constraint solver",
       status: "complete",
       details: [
@@ -61,7 +75,7 @@ const RESUME = {
     },
     {
       id: "engagemint",
-      name: "github.com/russelljoa/EngageMint",
+      name: "EngageMint",
       desc: "creator rewards platform",
       status: "hackathon",
       details: [
@@ -89,7 +103,7 @@ const RESUME = {
     },
     {
       id: "westtown-school-dining-menu",
-      name: "github.com/russelljoa/Westtown-School-Dining-Menu",
+      name: "Westtown School Dining Menu",
       desc: "cafeteria menu",
       status: "complete",
       details: [
@@ -103,6 +117,28 @@ const RESUME = {
   }
   ],
   experience: [
+    {
+      id: "boston-university",
+      date: "Sep 2026 – Present",
+      company: "Boston University",
+      role: "Software Engineer Intern",
+      details: [
+        "Building an LMS document accessibility scoring dashboard for Questrom School of Business",
+        "Cleaning and aggregating course-level document data across 4.5 million files by university program for historical trend reporting",
+        "Designing a Next.js frontend and Power BI dashboard for data visualization and on-demand accessibility reports"
+      ]
+    },
+    {
+      id: "comcast",
+      date: "Jun 2026 – Aug 2026",
+      company: "Comcast",
+      role: "Global Audit Technology Intern",
+      details: [
+        "Supported internal audit of Comcast’s advertisement distribution business unit, Freewheel, focusing on information security, data protection, data classification, user access management, and privileged user management controls",
+        "Tested data retention, encryption at rest and in transit, data classification, and privileged access controls against company standards and defined policies for AWS infrastructure serving 100 million+ users daily",
+        "Documented testing results and presented engagement findings to SVPs and key stakeholders"
+      ]
+    },
     {
       id: "chesco",
       date: "2025-10",
@@ -155,10 +191,10 @@ const RESUME = {
     }
   ],
   skills: {
-    languages: ["python", "ts/js", "java", "sql", "solidity", "(c/c++ php asm)"],
+    languages: ["Python", "TypeScript/JavaScript", "Java", "Go", "(familiar: C, C++, PHP, Assembly)"],
     frameworks: ["react", "nextjs", "node", "flask"],
-    db: ["mongodb", "mysql", "postgres", "supabase"],
-    cloud_devops: ["aws(s3 lambda ec2 ses)", "vercel", "heroku", "git", "redis"],
+    database: ["PostgreSQL", "MongoDB", "MySQL"],
+    cloud_devops: ["Terraform", "AWS (SAM, S3, Lambda, EC2, RDS, DynamoDB, API Gateway)", "Redis", "Git/GitHub"],
     other: ["systems design", "rest apis", "socket.io"]
   }
 };
@@ -658,6 +694,7 @@ function ExperienceItem({ exp, index }) {
               <div className="flex flex-wrap items-baseline gap-2">
                   <span className="font-mono font-bold text-accent">[{exp.date}]</span>
                   <span className="font-bold">{exp.company}</span>
+                  {exp.location && <span className="text-muted text-xs">| {exp.location}</span>}
                   <span className="text-muted text-xs hidden md:inline"> // {exp.role}</span>
               </div>
           </div>
