@@ -34,7 +34,7 @@ const RESUME = {
       id: "polymarket-bitcoin-trader",
       name: "Polymarket Sentiment Bitcoin Data Platform",
       desc: "quantitative crypto trading platform",
-      status: "August 2026",
+      status: "complete",
       details: [
         "Architected a Python-based quantitative trading data platform processing data from 5 crypto exchange data sources, enabling cryptocurrency and prediction market research",
         "Built a backtesting CLI tool for strategy testing",
